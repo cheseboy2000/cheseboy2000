@@ -1,3 +1,7 @@
+cd D:\htdocs\git\cheseboy2000\
+python wall_all.py
+pause
+exit
 d:
 cd d:\htdocs\online-crm
 git pull
@@ -9,4 +13,3 @@ git tag 筑龙后台-%t: =0%-修改
 git push  origin 筑龙后台-%t: =0%-修改
 cd D:\htdocs\git\cheseboy2000\
 python wall.py
-pause

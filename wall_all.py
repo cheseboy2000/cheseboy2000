@@ -19,14 +19,32 @@ def getTheMonth(date, n):
     return datetime.date(year, month, 1)
 date = datetime.datetime.today()
 nowtime = date.strftime("%Y%m%d%H%M%S")
+print("D:/htdocs/online-crm")
 r = Git("D:/htdocs/online-crm")
-# r.execute('git fetch --all')
-# r.execute('git pull --all')
-# r.execute('git merge crmsaller_20191014') 
-# r.execute('git push')
-tagname = '筑龙后台-'+nowtime+'-修改'
+print("git fetch --all")
+r.execute('git fetch --all')
+print("git pull --all")
+r.execute('git pull --all')
+print("git fetch origin crmsaller_20191014:crmsaller_20191014")
+r.execute("git fetch origin crmsaller_20191014:crmsaller_20191014")
+print("git merge crmsaller_20191014")
+r.execute('git merge crmsaller_20191014')
+print("git push")
+r.execute('git push')
+print("git push  origin master")
+r.execute('git push  origin master')
+status=r.execute('git log -10')
+strs=status.split("\n")
+info =''
+for index in range(6,60,6):
+    info=strs[index].replace(' ','')
+    if info!='' and info.find("Merge") == -1 :
+        break 
+tagname = '筑龙后台-'+nowtime+'-修改-'+info
 tagnameGBK=tagname.decode('utf-8').encode('GBK')
+print('git tag '+tagnameGBK)
 r.execute('git tag '+tagnameGBK)
+print('git push origin master tag '+tagnameGBK)
 r.execute('git push origin master tag '+tagnameGBK)
 driver = webdriver.Chrome()
 driver.get('http://walle.zhulong.dj:8484/login')
@@ -40,7 +58,7 @@ for i in inputs:
 driver.find_element_by_tag_name('button').click()
 time.sleep(1);
 #60 线上 59 测试
-driver.get('http://walle.zhulong.dj:8484/%E7%AD%91%E9%BE%99%E5%AD%A6%E7%A4%BE/task/create/59')
+driver.get('http://walle.zhulong.dj:8484/%E7%AD%91%E9%BE%99%E5%AD%A6%E7%A4%BE/task/create/60')
 time.sleep(2);
 #driver.find_elements_by_tag_name("input").send_keys('111')
 inputs = driver.find_elements_by_tag_name("input")
