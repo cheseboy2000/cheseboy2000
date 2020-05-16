@@ -1,3 +1,4 @@
+chcp 65001
 cd D:\htdocs\git\cheseboy2000\
 python wall_all.py
 pause
