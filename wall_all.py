@@ -60,7 +60,7 @@ class WallHandle:
         driver=self.driver
         #60 线上 59 测试
         driver.get('http://walle.zhulong.dj:8484/筑龙学社/task/create/'+str(num))
-        time.sleep(2)
+        time.sleep(4)
         driver.find_elements_by_class_name("el-input__inner")[0].send_keys(tagname)
         driver.find_elements_by_class_name("el-button")[1].click()
         time.sleep(2)
@@ -77,12 +77,32 @@ class WallHandle:
     def gitpull(self):
         date = datetime.datetime.today()
         nowtime = date.strftime("%Y%m%d%H%M%S")
-        lines='''git fetch --all
+        lines='''git checkout master
+        git fetch --all
+        git pull --all
+        git fetch origin online:online
+        git merge online
+        git push
+        git push  origin master
+        '''
+        self.gitExe("D:/htdocs/online-crm",lines)
+        info=self.getLogDesc("D:/htdocs/online-crm")
+        tagname = '筑龙后台-'+nowtime+'-修改-'+info
+        tagname=tagname.decode('utf8').encode('gb2312')
+        lines='git tag '+tagname
+        self.gitExe("D:/htdocs/online-crm",lines)
+        lines='git push origin master tag '+tagname
+        self.gitExe("D:/htdocs/online-crm",lines)
+    def gitpullonline(self):
+        date = datetime.datetime.today()
+        nowtime = date.strftime("%Y%m%d%H%M%S")
+        lines='''git checkout online
+        git fetch --all
         git pull --all
         git fetch origin crmsaller_20191014:crmsaller_20191014
         git merge crmsaller_20191014
         git push
-        git push  origin master
+        git push  origin online
         '''
         self.gitExe("D:/htdocs/online-crm",lines)
         info=self.getLogDesc("D:/htdocs/online-crm")
@@ -97,6 +117,8 @@ class WallHandle:
         self.publish(num)
     def publish(self,num):
         driver=self.driver
+        driver.get('http://walle.zhulong.dj:8484/')
+        time.sleep(2)
         driver.get('http://walle.zhulong.dj:8484/筑龙学社/task/create/'+str(num))
         time.sleep(2)
         inputs = driver.find_elements_by_tag_name("input")
@@ -107,22 +129,31 @@ class WallHandle:
                     return
                 try :
                     i.click()
+                    time.sleep(1)
+                    el=driver.find_elements_by_class_name("el-select-dropdown__item")
+                    text=el[0].find_element_by_tag_name("span").text
+                    driver.find_elements_by_class_name("el-input__inner")[0].send_keys(text)
+                    el[0].find_element_by_tag_name("span").click()
                 except Exception :
-                    break
-                time.sleep(1)
-                el=driver.find_elements_by_class_name("el-select-dropdown__item")
-                text=el[0].find_element_by_tag_name("span").text
-                driver.find_elements_by_class_name("el-input__inner")[0].send_keys(text)
-                el[0].find_element_by_tag_name("span").click()
+                    print("异常")
+                    return 
                 break
-        driver.find_elements_by_class_name("el-button")[1].click()
-        time.sleep(2)
+        try :
+            driver.find_elements_by_class_name("el-button")[1].click()
+            time.sleep(2)
+        except Exception :
+            print("异常")
+            return 
         driver.get('http://walle.zhulong.dj:8484/筑龙学社/deploy/index')
         time.sleep(2)
         buttons=driver.find_elements_by_class_name("el-button--text")
         for i in buttons:
             if i.find_element_by_tag_name("span").text == "上线":
-                i.click()
+                try :
+                    i.click()
+                except Exception :
+                    print("异常")
+                    return 
                 break
         time.sleep(2)        
         driver.find_element_by_class_name("el-button--success").click()
@@ -135,6 +166,7 @@ info='''请输入你的选择：
          4.上线到预发布服务器
          5.更新git代码
          6.退出
+         7.更新到online
 '''
 while 1==1 : 
     print(info)
@@ -152,6 +184,8 @@ while 1==1 :
     elif inputstr=='6':
         handle.driver.close()
         sys.exit()
+    elif inputstr=='7':
+        handle.gitpullonline()
     else:
         pass
 
