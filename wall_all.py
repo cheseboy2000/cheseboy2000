@@ -24,6 +24,7 @@ class WallHandle:
         driver.find_element_by_tag_name('button').click()
         time.sleep(1)
         self.driver=driver
+        driver.get('http://walle.zhulong.dj:8484/筑龙学社/deploy/index')
     def getTheMonth(self,date, n):
         month = date.month
         year = date.year
@@ -117,7 +118,7 @@ class WallHandle:
         self.publish(num)
     def publish(self,num):
         driver=self.driver
-        driver.get('http://walle.zhulong.dj:8484/')
+        driver.get('http://walle.zhulong.dj:8484/筑龙学社/deploy/index')
         time.sleep(2)
         driver.get('http://walle.zhulong.dj:8484/筑龙学社/task/create/'+str(num))
         time.sleep(2)
@@ -165,8 +166,7 @@ info='''请输入你的选择：
          3.上线到正式服务器
          4.上线到预发布服务器
          5.更新git代码
-         6.退出
-         7.更新到online
+         6.更新到online
 '''
 while 1==1 : 
     print(info)
@@ -182,9 +182,6 @@ while 1==1 :
     elif inputstr=='5':
         handle.gitpull()
     elif inputstr=='6':
-        handle.driver.close()
-        sys.exit()
-    elif inputstr=='7':
         handle.gitpullonline()
     else:
         pass
