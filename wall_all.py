@@ -12,19 +12,8 @@ class WallHandle:
         options = webdriver.ChromeOptions()
         options.add_argument('--ignore-certificate-errors')
         options.add_argument('--ignore-ssl-errors')
-        driver = webdriver.Chrome(chrome_options=options)
-        driver.get('http://walle.zhulong.dj:8484/login')
-        time.sleep(1)
-        inputs = driver.find_elements_by_tag_name("input")
-        for i in inputs:
-            if i.get_attribute("type") == "text":
-                i.send_keys('tanlei@zhulong.com')
-            elif i.get_attribute("placeholder") == "请输入密码":
-                i.send_keys('Zhulong123')
-        driver.find_element_by_tag_name('button').click()
-        time.sleep(1)
+        driver = webdriver.Chrome(options=options)
         self.driver=driver
-        driver.get('http://walle.zhulong.dj:8484/筑龙学社/deploy/index')
     def getTheMonth(self,date, n):
         month = date.month
         year = date.year
@@ -43,7 +32,11 @@ class WallHandle:
             if index!='' :
                 if index.find("tag")==-1 :
                     print(index)
-                r.execute(index)
+                try :
+                    r.execute(index)
+                except Exception :
+                    print("异常")
+                    return 
     def getLogDesc(self,dirStr):
         r = Git(dirStr)
         status=r.execute('git log -10')
@@ -81,13 +74,16 @@ class WallHandle:
         lines='''git checkout master
         git fetch --all
         git pull --all
-        git fetch origin online:online
-        git merge online
+        git fetch origin develop:develop
+        git merge develop
         git push
         git push  origin master
         '''
         self.gitExe("D:/htdocs/online-crm",lines)
         info=self.getLogDesc("D:/htdocs/online-crm")
+        info=info.strip()
+        info=info.replace('#','')
+        info=info.replace('*','')
         tagname = '筑龙后台-'+nowtime+'-修改-'+info
         tagname=tagname.decode('utf8').encode('gb2312')
         lines='git tag '+tagname
@@ -100,13 +96,16 @@ class WallHandle:
         lines='''git checkout online
         git fetch --all
         git pull --all
-        git fetch origin crmsaller_20191014:crmsaller_20191014
-        git merge crmsaller_20191014
+        git fetch origin develop:develop
+        git merge develop
         git push
         git push  origin online
         '''
         self.gitExe("D:/htdocs/online-crm",lines)
         info=self.getLogDesc("D:/htdocs/online-crm")
+        info=info.strip()
+        info=info.replace('#','')
+        info=info.replace('*','')
         tagname = '筑龙后台-'+nowtime+'-修改-'+info
         tagname=tagname.decode('utf8').encode('gb2312')
         lines='git tag '+tagname
@@ -118,10 +117,8 @@ class WallHandle:
         self.publish(num)
     def publish(self,num):
         driver=self.driver
-        driver.get('http://walle.zhulong.dj:8484/筑龙学社/deploy/index')
-        time.sleep(2)
         driver.get('http://walle.zhulong.dj:8484/筑龙学社/task/create/'+str(num))
-        time.sleep(2)
+        time.sleep(5)
         inputs = driver.find_elements_by_tag_name("input")
         for i in inputs:
             if i.get_attribute("placeholder") == "选取Tag":
@@ -136,15 +133,29 @@ class WallHandle:
                     driver.find_elements_by_class_name("el-input__inner")[0].send_keys(text)
                     el[0].find_element_by_tag_name("span").click()
                 except Exception :
-                    print("异常")
-                    return 
+                    try :
+                        time.sleep(5)
+                        i.click()
+                        time.sleep(1)
+                        el=driver.find_elements_by_class_name("el-select-dropdown__item")
+                        text=el[0].find_element_by_tag_name("span").text
+                        driver.find_elements_by_class_name("el-input__inner")[0].send_keys(text)
+                        el[0].find_element_by_tag_name("span").click()
+                    except Exception :
+                        print("异常143")
+                        return 
                 break
         try :
             driver.find_elements_by_class_name("el-button")[1].click()
             time.sleep(2)
         except Exception :
-            print("异常")
-            return 
+            try :
+                time.sleep(3)
+                driver.find_elements_by_class_name("el-button")[1].click()
+                time.sleep(2)
+            except Exception :
+                print("异常155")
+                return 
         driver.get('http://walle.zhulong.dj:8484/筑龙学社/deploy/index')
         time.sleep(2)
         buttons=driver.find_elements_by_class_name("el-button--text")
@@ -153,12 +164,47 @@ class WallHandle:
                 try :
                     i.click()
                 except Exception :
-                    print("异常")
+                    print("异常165")
                     return 
                 break
         time.sleep(2)        
         driver.find_element_by_class_name("el-button--success").click()
         time.sleep(20)
+    def tag(self):
+        dirStr="D:/htdocs/online-crm"
+        r = Git(dirStr)
+        date = datetime.datetime.today()
+        nowtime = date.strftime("%Y%m%d%H%M%S")
+        info=self.getLogDesc("D:/htdocs/online-crm")
+        info=info.strip()
+        info=info.replace('#','')
+        info=info.replace(':','')
+        info=info.replace('*','')
+        tagname = '筑龙后台-'+nowtime+'-修改-'+info
+        tagname=tagname.decode('utf8').encode('gb2312')
+        lines='git tag '+tagname
+        print(lines.decode('gb2312').encode('utf8'))
+        self.gitExe("D:/htdocs/online-crm",lines)
+        lines='git push origin master tag '+tagname
+        self.gitExe("D:/htdocs/online-crm",lines)
+    def login(self):
+        driver = self.driver
+        driver.get('http://walle.zhulong.dj:8484/login')
+        time.sleep(1)
+        inputs = driver.find_elements_by_tag_name("input")
+        for i in inputs:
+            if i.get_attribute("type") == "text":
+                i.send_keys('tanlei@zhulong.com')
+            elif i.get_attribute("placeholder") == "请输入密码":
+                i.send_keys('Zhulong123')
+        driver.find_element_by_tag_name('button').click()
+        time.sleep(1)
+        self.driver=driver
+        driver.get('http://walle.zhulong.dj:8484/筑龙学社/deploy/index')
+    def exit(self):
+        driver = self.driver
+        driver.quit()
+        sys.exit()
 handle = WallHandle()
 info='''请输入你的选择：
          1.更新git代码并正式服务器
@@ -166,7 +212,10 @@ info='''请输入你的选择：
          3.上线到正式服务器
          4.上线到预发布服务器
          5.更新git代码
-         6.更新到online
+         6.--更新到online--
+         7.打标签
+         8.登录
+         9.退出
 '''
 while 1==1 : 
     print(info)
@@ -183,6 +232,12 @@ while 1==1 :
         handle.gitpull()
     elif inputstr=='6':
         handle.gitpullonline()
+    elif inputstr=='7':
+        handle.tag()
+    elif inputstr=='8':
+       handle.login()
+    elif inputstr=='9':
+        handle.exit()
     else:
         pass
 

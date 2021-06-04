@@ -1,3 +1,4 @@
+# -- coding: utf-8 --
 import time
 import datetime
 from selenium import webdriver
@@ -16,7 +17,7 @@ lastmonth = getTheMonth(date, 1).strftime("%Y-%m")
 driver = webdriver.Chrome()
 driver.get('https://passport.zhulong.com/user/login?redirecturl=https://passport.zhulong.com/user/staff?pingce_time='+lastmonth)
 driver.execute_script("return $('#btns li:eq(1)')[0]").click()
-driver.find_element_by_id('Uname').send_keys('cheseboy2000')
+driver.find_element_by_id('Uname').send_keys(u'黄小梨')
 driver.find_element_by_id('password').send_keys('tenenl111')
 driver.find_elements_by_class_name('denglu_btn')[0].click()
 ep=driver.find_elements_by_name("ep")

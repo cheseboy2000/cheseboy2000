@@ -53,8 +53,8 @@ class WallHandle:
             raise e
         finally :
             pass
-        list=['opencrm','testnewcommon','testnewadmin','testnewauth','openpassport','openbbs','openpay']
-        list=['openpay',]
+        list=['testnewcommon','openbbs','openpay','openedu','openshouye','openvip','openucenter','opencrm','testnewauth','testnewadmin','openpassport']
+        list=['opencrm']
         for v in list:
             try: 
                 id=self.dist[v]
@@ -105,13 +105,15 @@ class WallHandle:
             driver.find_elements_by_class_name("wl-task-edit__refresh")[0].click()
         if driver.find_elements_by_class_name("el-input__inner")[1].get_attribute("value")!="develop":
             try :
+                time.sleep(3)
                 driver.find_elements_by_class_name("el-input__inner")[1].click()
             except Exception :
-                time.sleep(5)
+                print("分支点击失败1")
+                time.sleep(10)
                 try :
                     driver.find_elements_by_class_name("el-input__inner")[1].click()
                 except Exception :
-                    print("分支点击失败")
+                    print("分支点击失败2")
                     return False
             boolean=True
             for el in driver.find_elements_by_class_name("el-select-dropdown__wrap")[1].find_elements_by_class_name("el-select-dropdown__item"):
@@ -131,20 +133,33 @@ class WallHandle:
                     time.sleep(3)
                     boolean=False
             if boolean :
-                driver.find_elements_by_class_name("el-select-dropdown__wrap")[1].find_elements_by_class_name("el-select-dropdown__item")[0].click()
+                try :
+                    driver.find_elements_by_class_name("el-select-dropdown__wrap")[1].find_elements_by_class_name("el-select-dropdown__item")[0].click()
+                except Exception :
+                    print("下拉点击失败")
+                    return False
         time.sleep(5)
         try :
             driver.find_elements_by_class_name("el-input__inner")[2].click()
         except Exception :
             time.sleep(3)
-            driver.find_elements_by_class_name("el-input__inner")[2].click()
+            try :
+                driver.find_elements_by_class_name("el-input__inner")[2].click()
+            except Exception :
+                print("下拉点击失败2")
+                return False
         try :
             driver.find_elements_by_class_name("el-select-dropdown__wrap")[1].find_elements_by_class_name("el-select-dropdown__item")[0].click()
         except Exception :
             time.sleep(3)
-            driver.find_elements_by_class_name("el-select-dropdown__wrap")[1].find_elements_by_class_name("el-select-dropdown__item")[0].click()
+            try :
+                driver.find_elements_by_class_name("el-select-dropdown__wrap")[1].find_elements_by_class_name("el-select-dropdown__item")[0].click()
+            except Exception :
+                print("下拉点击失败3")
+                return False
         text=driver.find_elements_by_class_name("el-input__inner")[2].get_attribute("value")
         if text.find(code)>-1 :
+            print("版本一致:"+code)
             return
         date = datetime.datetime.today()
         nowtime = date.strftime("%Y%m%d%H%M%S")
@@ -172,8 +187,12 @@ class WallHandle:
                     print("异常")
                     return 
                 break
-        time.sleep(2)        
-        driver.find_element_by_class_name("el-button--success").click()
+        time.sleep(2)
+        try :    
+            driver.find_element_by_class_name("el-button--success").click()
+        except Exception :
+            time.sleep(5)
+            driver.find_element_by_class_name("el-button--success").click()
         time.sleep(20)
         driver.get('http://walle.zhulong.dj:8484/筑龙学社/deploy/index')
 
